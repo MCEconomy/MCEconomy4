@@ -1,0 +1,4 @@
+{
+  "commands.mp.set": "%s mp",
+  "commands.mp.success.self": "Set own money to %s"
+}
