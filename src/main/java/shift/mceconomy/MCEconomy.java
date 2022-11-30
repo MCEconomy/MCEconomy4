@@ -16,6 +16,7 @@ import net.minecraftforge.registries.IForgeRegistry;
 import shift.mceconomy.api.money.CapabilityMoneyStorage;
 import shift.mceconomy.config.ConfigHolder;
 import shift.mceconomy.gui.MpHud;
+import shift.mceconomy.gui.MpTooltip;
 import shift.mceconomy.packet.PacketHandler;
 import shift.mceconomy.player.CapabilityMPHandler;
 import shift.mceconomy.proxy.ClientProxy;
@@ -39,11 +40,13 @@ public class MCEconomy {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         modEventBus.register(new MpHud());
+        modEventBus.register(new MCEClientEvents());
         MinecraftForge.EVENT_BUS.register(new MpCommand());
         MinecraftForge.EVENT_BUS.register(new MCECommonEventManager());
 
         MinecraftForge.EVENT_BUS.register(new CapabilityMoneyStorage());
         MinecraftForge.EVENT_BUS.register(new CapabilityMPHandler());
+        MinecraftForge.EVENT_BUS.register(new MpTooltip());
 
         final ModLoadingContext modLoadingContext = ModLoadingContext.get();
         modLoadingContext.registerConfig(ModConfig.Type.CLIENT, ConfigHolder.CLIENT_SPEC);
