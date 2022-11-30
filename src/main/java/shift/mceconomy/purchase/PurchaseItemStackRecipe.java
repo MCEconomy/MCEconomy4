@@ -18,16 +18,18 @@ public class PurchaseItemStackRecipe implements Recipe<ItemStackContainer> {
 
     private final ResourceLocation recipeId;
     private final int amount;
+    private final boolean notForSale;
     private final Ingredient recipeItems;
 
-    public PurchaseItemStackRecipe(ResourceLocation recipeId, int amount, Ingredient recipeItems) {
+    public PurchaseItemStackRecipe(ResourceLocation recipeId, int amount, boolean notForSale, Ingredient recipeItems) {
         this.recipeId = recipeId;
         this.amount = amount;
+        this.notForSale = notForSale;
         this.recipeItems = recipeItems;
     }
 
     @Override
-    public boolean matches(ItemStackContainer pContainer, Level pLevel) {
+    public boolean matches(ItemStackContainer pContainer, @NotNull Level pLevel) {
         return recipeItems.test(pContainer.getItem(0));
     }
 
@@ -37,7 +39,7 @@ public class PurchaseItemStackRecipe implements Recipe<ItemStackContainer> {
 
     @Override
     @NotNull
-    public ItemStack assemble(ItemStackContainer pContainer) {
+    public ItemStack assemble(@NotNull ItemStackContainer pContainer) {
         return ItemStack.EMPTY;
     }
 
@@ -74,34 +76,41 @@ public class PurchaseItemStackRecipe implements Recipe<ItemStackContainer> {
         return amount;
     }
 
+    public boolean isNotForSale() {
+        return notForSale;
+    }
+
     public static class Serializer implements RecipeSerializer<PurchaseItemStackRecipe> {
 
         @Override
         @NotNull
-        public PurchaseItemStackRecipe fromJson(ResourceLocation pRecipeId, JsonObject pSerializedRecipe) {
+        public PurchaseItemStackRecipe fromJson(@NotNull ResourceLocation pRecipeId, @NotNull JsonObject pSerializedRecipe) {
 
             int price = GsonHelper.getAsInt(pSerializedRecipe, "price", 0);
+            boolean notForSale = GsonHelper.getAsBoolean(pSerializedRecipe, "not_for_sale", false);
 
             JsonElement jsonelement = (JsonElement) (GsonHelper.isArrayNode(pSerializedRecipe, "ingredient") ? GsonHelper.getAsJsonArray(pSerializedRecipe, "ingredient") : GsonHelper.getAsJsonObject(pSerializedRecipe, "ingredient"));
             Ingredient ingredient = Ingredient.fromJson(jsonelement);
 
-            return new PurchaseItemStackRecipe(pRecipeId, price, ingredient);
+            return new PurchaseItemStackRecipe(pRecipeId, price, notForSale, ingredient);
         }
 
         @Override
         @NotNull
-        public PurchaseItemStackRecipe fromNetwork(ResourceLocation pRecipeId, FriendlyByteBuf pBuffer) {
+        public PurchaseItemStackRecipe fromNetwork(@NotNull ResourceLocation pRecipeId, FriendlyByteBuf pBuffer) {
 
             int price = pBuffer.readVarInt();
+            boolean notForSale = pBuffer.readBoolean();
             Ingredient ingredient = Ingredient.fromNetwork(pBuffer);
 
-            return new PurchaseItemStackRecipe(pRecipeId, price, ingredient);
+            return new PurchaseItemStackRecipe(pRecipeId, price, notForSale, ingredient);
         }
 
         @Override
         public void toNetwork(FriendlyByteBuf pBuffer, PurchaseItemStackRecipe pRecipe) {
 
             pBuffer.writeVarInt(pRecipe.getAmount());
+            pBuffer.writeBoolean(pRecipe.isNotForSale());
             pRecipe.recipeItems.toNetwork(pBuffer);
 
         }

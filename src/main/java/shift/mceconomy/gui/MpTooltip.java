@@ -13,6 +13,7 @@ import shift.mceconomy.MCEconomy;
 import shift.mceconomy.purchase.PurchaseItemStackRecipe;
 
 import java.util.List;
+import java.util.Optional;
 
 public class MpTooltip {
 
@@ -34,21 +35,24 @@ public class MpTooltip {
         ItemStack itemStack = event.getItemStack();
         List<Either<FormattedText, TooltipComponent>> toolTip = event.getTooltipElements();
 
-        int i = player
+        Optional<PurchaseItemStackRecipe> purchaseItemStackRecipeOptional = player
                 .getLevel()
                 .getRecipeManager()
                 .getAllRecipesFor(MCERecipes.PURCHASE_ITEM_STACK.get()).stream().filter(recipe -> recipe.matches(itemStack))
-                .map(PurchaseItemStackRecipe::getAmount)
-                .findFirst()
-                .orElse(-2);
+                .findFirst();
 
-        if (i == -1) {
+        if (purchaseItemStackRecipeOptional.isEmpty()) {
+            return;
+        }
+
+        PurchaseItemStackRecipe purchaseItemStackRecipe = purchaseItemStackRecipeOptional.get();
+        if (purchaseItemStackRecipe.isNotForSale()) {
             toolTip.add(Either.right(new MpTooltipComponent(true, 0)));
             return;
         }
 
-        if (i != -2) {
-            toolTip.add(Either.right(new MpTooltipComponent(false, i)));
+        if (!purchaseItemStackRecipe.isNotForSale()) {
+            toolTip.add(Either.right(new MpTooltipComponent(false, purchaseItemStackRecipe.getAmount())));
         }
 
     }

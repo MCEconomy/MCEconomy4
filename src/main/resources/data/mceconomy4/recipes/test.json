@@ -1,6 +1,6 @@
 {
   "type": "mceconomy4:purchase_item_stack",
-  "price": 100,
+  "not_for_sale": true,
   "ingredient": {
     "item": "minecraft:golden_axe"
   }
