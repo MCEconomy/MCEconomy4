@@ -32,6 +32,10 @@ public class PurchaseRecipeBuilder implements RecipeBuilder {
         return new PurchaseRecipeBuilder(amount, false, recipeItems);
     }
 
+    public static PurchaseRecipeBuilder notForSale(Ingredient recipeItems) {
+        return new PurchaseRecipeBuilder(0, true, recipeItems);
+    }
+
     @Override
     @NotNull
     public RecipeBuilder unlockedBy(String pCriterionName, CriterionTriggerInstance pCriterionTrigger) {

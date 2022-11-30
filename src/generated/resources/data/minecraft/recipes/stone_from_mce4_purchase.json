@@ -1,8 +1,8 @@
 {
   "type": "mceconomy4:purchase_item_stack",
   "ingredient": {
-    "item": "minecraft:coal"
+    "item": "minecraft:stone"
   },
   "not_for_sale": false,
-  "price": 50
+  "price": 1
 }
