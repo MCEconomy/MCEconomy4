@@ -1,5 +1,7 @@
 package shift.mceconomy;
 
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
@@ -8,6 +10,9 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.IForgeRegistry;
 import shift.mceconomy.api.money.CapabilityMoneyStorage;
 import shift.mceconomy.config.ConfigHolder;
 import shift.mceconomy.gui.MpHud;
@@ -23,6 +28,11 @@ public class MCEconomy {
     public static final String MOD_ID = "mceconomy4";
 
     public static final IProxy proxy = DistExecutor.safeRunForDist(() -> ClientProxy::new, () -> CommonProxy::new);
+
+
+    public static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = create(ForgeRegistries.RECIPE_TYPES);
+
+    public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = create(ForgeRegistries.RECIPE_SERIALIZERS);
 
     public MCEconomy() {
 
@@ -47,12 +57,23 @@ public class MCEconomy {
 //        StartupMessageManager.addModMessage("MCEconomy version " + "1.0.4");
 
         modEventBus.addListener(this::preInit);
-        
+
+        modEventBus.addListener(this::preInit);
+
+        //各種登録
+        RECIPE_TYPES.register(FMLJavaModLoadingContext.get().getModEventBus());
+        RECIPE_SERIALIZERS.register(FMLJavaModLoadingContext.get().getModEventBus());
+        MCERecipes.register();
+
     }
 
 
     public void preInit(FMLCommonSetupEvent evt) {
         PacketHandler.init(evt);
+    }
+
+    private static <T> DeferredRegister<T> create(IForgeRegistry<T> registry) {
+        return DeferredRegister.create(registry, MCEconomy.MOD_ID);
     }
 
 }
