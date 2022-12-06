@@ -149,9 +149,9 @@ public class MPManager {//} implements IMPManager {
     }
 
     //@Override
-    public void setPlayerMP(ServerPlayer Player, int amount) {
-        getMPEntityProperty(Player).setMp(Math.max(0, Math.min(amount, MCEConfig.maxMp)));
-        sendPacket(Player);
+    public void setPlayerMP(ServerPlayer serverPlayer, int amount) {
+        getMPEntityProperty(serverPlayer).setMp(Math.max(0, Math.min(amount, MCEConfig.maxMp)));
+        sendPacket(serverPlayer);
     }
 
     //@Override

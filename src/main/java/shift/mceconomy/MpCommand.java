@@ -10,10 +10,13 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.network.NetworkHooks;
 import shift.mceconomy.config.MCEConfig;
+import shift.mceconomy.gui.ShopMenu;
 import shift.mceconomy.player.MPManager;
 
 import java.util.Collection;
@@ -62,6 +65,25 @@ public class MpCommand {
 
         dispatcher.register(literalArgumentBuilder);
 
+        //shop
+        LiteralArgumentBuilder<CommandSourceStack> shopArgumentBuilder = Commands.literal("shop").requires((source) -> {
+            return source.hasPermission(Commands.LEVEL_GAMEMASTERS);
+        });
+
+        shopArgumentBuilder
+                .then(Commands.literal("open")
+                        .then(Commands.argument("id", IntegerArgumentType.integer(0, MCEConfig.maxMp)).executes((sourceCommandContext) -> {
+                            return openShop(sourceCommandContext, Collections.singleton(sourceCommandContext.getSource().getPlayer()), IntegerArgumentType.getInteger(sourceCommandContext, "id"));
+                        }))
+                        .then(Commands.argument("target", EntityArgument.players())
+                                .then(Commands.argument("id", IntegerArgumentType.integer(0, MCEConfig.maxMp)).executes((sourceCommandContext) -> {
+                                    return openShop(sourceCommandContext, EntityArgument.getPlayers(sourceCommandContext, "target"), IntegerArgumentType.getInteger(sourceCommandContext, "id"));
+                                }))
+                        )
+                );
+
+        dispatcher.register(shopArgumentBuilder);
+
     }
 
     private static int setMp(CommandContext<CommandSourceStack> source, Collection<ServerPlayer> players, int mp) {
@@ -85,6 +107,22 @@ public class MpCommand {
 
             MPManager.getInstance().addPlayerMP(serverPlayerEntity, mp, false);
             sendMpFeedback(source.getSource(), serverPlayerEntity, mp);
+            ++i;
+
+        }
+
+        return i;
+    }
+
+    private static int openShop(CommandContext<CommandSourceStack> source, Collection<ServerPlayer> players, int id) {
+        int i = 0;
+
+        for (ServerPlayer serverPlayerEntity : players) {
+
+            NetworkHooks.openScreen(serverPlayerEntity, new SimpleMenuProvider(
+                    (containerId, playerInventory, player) -> new ShopMenu(containerId, playerInventory, null),
+                    Component.translatable("シンプルショップ")
+            ));
             ++i;
 
         }

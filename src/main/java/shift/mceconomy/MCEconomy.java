@@ -1,5 +1,7 @@
 package shift.mceconomy;
 
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.common.MinecraftForge;
@@ -8,6 +10,7 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
@@ -17,6 +20,7 @@ import shift.mceconomy.api.money.CapabilityMoneyStorage;
 import shift.mceconomy.config.ConfigHolder;
 import shift.mceconomy.gui.MpHud;
 import shift.mceconomy.gui.MpTooltip;
+import shift.mceconomy.gui.ShopContainerScreen;
 import shift.mceconomy.packet.PacketHandler;
 import shift.mceconomy.player.CapabilityMPHandler;
 import shift.mceconomy.proxy.ClientProxy;
@@ -34,6 +38,8 @@ public class MCEconomy {
     public static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = create(ForgeRegistries.RECIPE_TYPES);
 
     public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = create(ForgeRegistries.RECIPE_SERIALIZERS);
+
+    public static final DeferredRegister<MenuType<?>> MENU_TYPES = create(ForgeRegistries.MENU_TYPES);
 
     public MCEconomy() {
 
@@ -61,18 +67,28 @@ public class MCEconomy {
 
         modEventBus.addListener(this::preInit);
 
-        modEventBus.addListener(this::preInit);
+        modEventBus.addListener(this::clientSetup);
+
 
         //各種登録
         RECIPE_TYPES.register(FMLJavaModLoadingContext.get().getModEventBus());
         RECIPE_SERIALIZERS.register(FMLJavaModLoadingContext.get().getModEventBus());
         MCERecipes.register();
 
+        MENU_TYPES.register(FMLJavaModLoadingContext.get().getModEventBus());
+        MCEGuis.register();
+
     }
 
 
     public void preInit(FMLCommonSetupEvent evt) {
         PacketHandler.init(evt);
+    }
+
+    public void clientSetup(FMLClientSetupEvent event) {
+        event.enqueueWork(
+                () -> MenuScreens.register(MCEGuis.SHOP_MENU.get(), ShopContainerScreen::new)
+        );
     }
 
     private static <T> DeferredRegister<T> create(IForgeRegistry<T> registry) {
