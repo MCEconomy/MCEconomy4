@@ -1,6 +1,9 @@
 package shift.mceconomy;
 
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.commands.synchronization.ArgumentTypeInfo;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -16,7 +19,10 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.RegistryBuilder;
+import shift.mceconomy.api.MCERegistries;
 import shift.mceconomy.api.money.CapabilityMoneyStorage;
+import shift.mceconomy.api.shop.IShop;
 import shift.mceconomy.config.ConfigHolder;
 import shift.mceconomy.gui.MpHud;
 import shift.mceconomy.gui.MpTooltip;
@@ -26,6 +32,8 @@ import shift.mceconomy.player.CapabilityMPHandler;
 import shift.mceconomy.proxy.ClientProxy;
 import shift.mceconomy.proxy.CommonProxy;
 import shift.mceconomy.proxy.IProxy;
+
+import java.util.function.Supplier;
 
 @Mod(MCEconomy.MOD_ID)
 public class MCEconomy {
@@ -41,6 +49,15 @@ public class MCEconomy {
 
     public static final DeferredRegister<MenuType<?>> MENU_TYPES = create(ForgeRegistries.MENU_TYPES);
 
+    public static final DeferredRegister<ArgumentTypeInfo<?, ?>> COMMAND_ARGUMENT_TYPES = create(ForgeRegistries.COMMAND_ARGUMENT_TYPES);
+
+    //SHOP
+    public static final DeferredRegister<IShop> DEFERRED_SHOPS = DeferredRegister.create(MCERegistries.Keys.SHOPS, MCEconomy.MOD_ID);
+
+    public static final Supplier<IForgeRegistry<IShop>> SHOP_REGISTRY = DEFERRED_SHOPS.makeRegistry(RegistryBuilder::new);
+
+    public static DeferredRegister<IShop> SHOPS = create(MCERegistries.Keys.SHOPS);
+    
     public MCEconomy() {
 
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -78,6 +95,14 @@ public class MCEconomy {
         MENU_TYPES.register(FMLJavaModLoadingContext.get().getModEventBus());
         MCEGuis.register();
 
+        COMMAND_ARGUMENT_TYPES.register(FMLJavaModLoadingContext.get().getModEventBus());
+        MCECommands.register();
+
+        DEFERRED_SHOPS.register(FMLJavaModLoadingContext.get().getModEventBus());
+
+        SHOPS.register(FMLJavaModLoadingContext.get().getModEventBus());
+        MCEShops.register();
+
     }
 
 
@@ -93,6 +118,10 @@ public class MCEconomy {
 
     private static <T> DeferredRegister<T> create(IForgeRegistry<T> registry) {
         return DeferredRegister.create(registry, MCEconomy.MOD_ID);
+    }
+
+    private static <T> DeferredRegister<T> create(ResourceKey<? extends Registry<T>> key) {
+        return DeferredRegister.createOptional(key, MCEconomy.MOD_ID);
     }
 
 }

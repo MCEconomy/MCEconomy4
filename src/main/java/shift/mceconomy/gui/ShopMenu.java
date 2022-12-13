@@ -1,9 +1,13 @@
 package shift.mceconomy.gui;
 
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import shift.mceconomy.MCEGuis;
@@ -15,8 +19,26 @@ import shift.mceconomy.MCEGuis;
  */
 public class ShopMenu extends AbstractContainerMenu {
 
+    //メモ IInventory -> Container
+    
+    private final Container container;
+    private final ContainerData containerData;
+
+    /**
+     * クライアント側
+     */
     public ShopMenu(int containerId, Inventory playerInventory, FriendlyByteBuf data) {
+        this(containerId, playerInventory);
+    }
+
+    /**
+     * サーバー側
+     */
+    public ShopMenu(int containerId, Inventory playerInventory) {
         super(MCEGuis.SHOP_MENU.get(), containerId);
+
+        this.container = new SimpleContainer(1);
+        this.containerData = new SimpleContainerData(2);
 
 
         //プレイヤーインベントリー

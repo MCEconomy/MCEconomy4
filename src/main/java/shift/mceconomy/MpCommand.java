@@ -4,17 +4,23 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.network.NetworkHooks;
+import net.minecraftforge.registries.ForgeRegistry;
+import net.minecraftforge.registries.RegistryManager;
+import shift.mceconomy.api.MCERegistries;
+import shift.mceconomy.api.shop.IShop;
 import shift.mceconomy.config.MCEConfig;
 import shift.mceconomy.gui.ShopMenu;
 import shift.mceconomy.player.MPManager;
@@ -36,6 +42,7 @@ public class MpCommand {
     public void onCommandsRegister(RegisterCommandsEvent event) {
 
         CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
+        CommandBuildContext buildContext = event.getBuildContext();
 
         // mp
         LiteralArgumentBuilder<CommandSourceStack> literalArgumentBuilder = Commands.literal("mp").requires((source) -> {
@@ -72,14 +79,14 @@ public class MpCommand {
 
         shopArgumentBuilder
                 .then(Commands.literal("open")
-                        .then(Commands.argument("id", IntegerArgumentType.integer(0, MCEConfig.maxMp)).executes((sourceCommandContext) -> {
-                            return openShop(sourceCommandContext, Collections.singleton(sourceCommandContext.getSource().getPlayer()), IntegerArgumentType.getInteger(sourceCommandContext, "id"));
-                        }))
-                        .then(Commands.argument("target", EntityArgument.players())
-                                .then(Commands.argument("id", IntegerArgumentType.integer(0, MCEConfig.maxMp)).executes((sourceCommandContext) -> {
-                                    return openShop(sourceCommandContext, EntityArgument.getPlayers(sourceCommandContext, "target"), IntegerArgumentType.getInteger(sourceCommandContext, "id"));
+                                .then(Commands.argument("id", ShopArgument.shopArgument()).executes((sourceCommandContext) -> {
+                                    return openShop(sourceCommandContext, Collections.singleton(sourceCommandContext.getSource().getPlayer()), ShopArgument.getString(sourceCommandContext, "id"));
                                 }))
-                        )
+//                        .then(Commands.argument("target", EntityArgument.players())
+//                                .then(Commands.argument("id", ShopArgument.shopArgument()).executes((sourceCommandContext) -> {
+//                                    return openShop(sourceCommandContext, EntityArgument.getPlayers(sourceCommandContext, "target"), ShopArgument.getString(sourceCommandContext, "id"));
+//                                }))
+//                        )
                 );
 
         dispatcher.register(shopArgumentBuilder);
@@ -114,15 +121,24 @@ public class MpCommand {
         return i;
     }
 
-    private static int openShop(CommandContext<CommandSourceStack> source, Collection<ServerPlayer> players, int id) {
+    private static int openShop(CommandContext<CommandSourceStack> source, Collection<ServerPlayer> players, String id) {
         int i = 0;
 
+        ForgeRegistry<IShop> registry = RegistryManager.ACTIVE.getRegistry(MCERegistries.Keys.SHOPS);
+        IShop shop = registry.getValue(new ResourceLocation(id));
+        
         for (ServerPlayer serverPlayerEntity : players) {
 
-            NetworkHooks.openScreen(serverPlayerEntity, new SimpleMenuProvider(
-                    (containerId, playerInventory, player) -> new ShopMenu(containerId, playerInventory, null),
-                    Component.translatable("シンプルショップ")
-            ));
+            NetworkHooks.openScreen(
+                    serverPlayerEntity,
+                    new SimpleMenuProvider(
+                            (containerId, playerInventory, player) -> new ShopMenu(containerId, playerInventory),
+                            shop.getShopName(serverPlayerEntity.level, serverPlayerEntity)
+                    ),
+                    buf -> {
+                        //サーバー側からデータを何か渡す場合
+                    }
+            );
             ++i;
 
         }
