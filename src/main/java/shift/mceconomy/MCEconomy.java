@@ -57,7 +57,7 @@ public class MCEconomy {
     public static final Supplier<IForgeRegistry<IShop>> SHOP_REGISTRY = DEFERRED_SHOPS.makeRegistry(RegistryBuilder::new);
 
     public static DeferredRegister<IShop> SHOPS = create(MCERegistries.Keys.SHOPS);
-    
+
     public MCEconomy() {
 
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -108,6 +108,7 @@ public class MCEconomy {
 
     public void preInit(FMLCommonSetupEvent evt) {
         PacketHandler.init(evt);
+        MCEShops.registerShopItem();
     }
 
     public void clientSetup(FMLClientSetupEvent event) {

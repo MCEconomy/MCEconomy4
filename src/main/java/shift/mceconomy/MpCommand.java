@@ -137,11 +137,12 @@ public class MpCommand {
             NetworkHooks.openScreen(
                     serverPlayerEntity,
                     new SimpleMenuProvider(
-                            (containerId, playerInventory, player) -> new ShopMenu(containerId, playerInventory),
+                            (containerId, playerInventory, player) -> new ShopMenu(containerId, playerInventory, shop),
                             shop.getShopName(serverPlayerEntity.level, serverPlayerEntity)
                     ),
                     buf -> {
                         //サーバー側からデータを何か渡す場合
+                        buf.writeUtf(id, 100);
                     }
             );
             ++i;
