@@ -1,5 +1,6 @@
 {
   "commands.mp.set": "%s mp",
   "commands.mp.success.self": "Set own money to %s",
+  "commands.shop.not_found": "Not found shop",
   "tooltip.mp.not_for_sale": "Not for sale"
 }

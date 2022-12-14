@@ -79,14 +79,14 @@ public class MpCommand {
 
         shopArgumentBuilder
                 .then(Commands.literal("open")
+                        .then(Commands.argument("id", ShopArgument.shopArgument()).executes((sourceCommandContext) -> {
+                            return openShop(sourceCommandContext, Collections.singleton(sourceCommandContext.getSource().getPlayer()), ShopArgument.getString(sourceCommandContext, "id"));
+                        }))
+                        .then(Commands.argument("target", EntityArgument.players())
                                 .then(Commands.argument("id", ShopArgument.shopArgument()).executes((sourceCommandContext) -> {
-                                    return openShop(sourceCommandContext, Collections.singleton(sourceCommandContext.getSource().getPlayer()), ShopArgument.getString(sourceCommandContext, "id"));
+                                    return openShop(sourceCommandContext, EntityArgument.getPlayers(sourceCommandContext, "target"), ShopArgument.getString(sourceCommandContext, "id"));
                                 }))
-//                        .then(Commands.argument("target", EntityArgument.players())
-//                                .then(Commands.argument("id", ShopArgument.shopArgument()).executes((sourceCommandContext) -> {
-//                                    return openShop(sourceCommandContext, EntityArgument.getPlayers(sourceCommandContext, "target"), ShopArgument.getString(sourceCommandContext, "id"));
-//                                }))
-//                        )
+                        )
                 );
 
         dispatcher.register(shopArgumentBuilder);
@@ -126,7 +126,12 @@ public class MpCommand {
 
         ForgeRegistry<IShop> registry = RegistryManager.ACTIVE.getRegistry(MCERegistries.Keys.SHOPS);
         IShop shop = registry.getValue(new ResourceLocation(id));
-        
+
+        if (shop == null) {
+            source.getSource().sendFailure(Component.translatable("commands.shop.not_found"));
+            return 0;
+        }
+
         for (ServerPlayer serverPlayerEntity : players) {
 
             NetworkHooks.openScreen(
