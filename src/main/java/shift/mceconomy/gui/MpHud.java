@@ -24,7 +24,7 @@ import shift.mceconomy.player.MPManager;
  */
 public class MpHud {
 
-    private static final ResourceLocation icons = new ResourceLocation(MCEconomy.MOD_ID, "textures/gui/icons.png");
+    public static final ResourceLocation icons = new ResourceLocation(MCEconomy.MOD_ID, "textures/gui/icons.png");
 
     private static Minecraft mc = Minecraft.getInstance();
 
@@ -211,5 +211,5 @@ public class MpHud {
     private static void bind(ResourceLocation res) {
         RenderSystem.setShaderTexture(0, res);
     }
-    
+
 }

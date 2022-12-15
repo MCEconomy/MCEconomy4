@@ -17,6 +17,7 @@ public class MCEShops {
     static void registerShopItem() {
         SIMPLE_SHOP.get().addProduct(new ProductBase(new ItemStack(Items.APPLE), 50));
         SIMPLE_SHOP.get().addProduct(new ProductBase(new ItemStack(Items.STICK), 10));
+        SIMPLE_SHOP.get().addProduct(new ProductBase(new ItemStack(Items.DIAMOND), 10000));
     }
 
 }
