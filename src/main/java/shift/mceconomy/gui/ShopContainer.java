@@ -25,8 +25,8 @@ public class ShopContainer implements Container {
     }
 
     public void setCurrentRecipeIndex(int index) {
-        this.currentRecipeIndex = 0;
-        this.clearContent();
+        this.currentRecipeIndex = index;
+        this.resetSlots();
     }
 
     public int getCurrentRecipeIndex() {

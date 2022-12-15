@@ -68,6 +68,10 @@ public class ShopMenu extends AbstractContainerMenu {
         this.container.setChanged();
     }
 
+    public IShop getShop() {
+        return shop;
+    }
+
     @Override
     public ItemStack quickMoveStack(Player pPlayer, int pIndex) {
         return null;
@@ -81,6 +85,7 @@ public class ShopMenu extends AbstractContainerMenu {
     public void setCurrentRecipeIndex(int i) {
 
         this.shopContainer.setCurrentRecipeIndex(i);
+
 
     }
 }

@@ -32,6 +32,8 @@ public class PacketHandler {
          */
         INSTANCE.registerMessage(0, PlayerMpPacket.class, PlayerMpPacket::encode, PlayerMpPacket::decode, PlayerMpPacket::handle);
 
+        INSTANCE.registerMessage(1, ShopButtonPacket.class, ShopButtonPacket::encode, ShopButtonPacket::decode, ShopButtonPacket::handle);
+
         //INSTANCE.registerMessage(MessagePlayerProperties.class, MessagePlayerProperties.class, 0, Side.CLIENT);
         //INSTANCE.registerMessage(0,MessagePlayerProperties.class);
 //		INSTANCE.registerMessage(ShopButtonHandler.class,PacketShopButton.class, 1, Side.SERVER);
