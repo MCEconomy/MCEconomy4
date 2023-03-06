@@ -73,8 +73,9 @@ public class ShopMenu extends AbstractContainerMenu {
     }
 
     @Override
-    public ItemStack quickMoveStack(Player pPlayer, int pIndex) {
-        return null;
+    @NotNull
+    public ItemStack quickMoveStack(@NotNull Player pPlayer, int pIndex) {
+        return ItemStack.EMPTY;
     }
 
     @Override
