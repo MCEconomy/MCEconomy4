@@ -42,7 +42,7 @@ public interface IMoneyStorage {
      * MPをストレージに設定する
      *
      * @param money 設定するMPの値
-     * @deprecated 出来れば使用してほしくない(将来の更新で消すことはないです)
+     * @deprecated 出来れば使用してほしくない(将来の更新で消す可能性大)
      */
     void setMoneyStored(int money);
 
